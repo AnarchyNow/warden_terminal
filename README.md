@@ -17,12 +17,8 @@ Displaying:
 
 ## Screenshot
 
+![Screen Shot](https://github.com/AnarchyNow/warden_terminal/static/images/Screen Shot.jpeg)
 
-
-
-            Screen Shot.jpeg
-          
-  
 
 ## Installation
 
