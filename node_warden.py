@@ -359,8 +359,6 @@ def login_tip():
     logging.info(string)
     logging.info(success("Like the app? Donate:"))
     logging.info(
-        success("tipping.me (Lightning): https://tippin.me/@iamalwaysred"))
-    logging.info(
         success(
             "onchain bc1q5erwtsz0ey27jwus4k02xa4x8weh083vr04xt7"
         ))
