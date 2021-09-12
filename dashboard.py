@@ -477,10 +477,10 @@ def main_dashboard(config, tor):
         sys_box.base_widget.set_text(data)
         main_loop.set_alarm_in(1, sys_updater)
         
-    def umbrel_updater(_loop, __data):
-        data = translate_text_for_urwid(data_umbrel())
-        mp_box.base_widget.set_text(data)
-        main_loop.set_alarm_in(1, umbrel_updater)
+#    def umbrel_updater(_loop, __data):
+#        data = translate_text_for_urwid(data_umbrel())
+#        mp_box.base_widget.set_text(data)
+#        main_loop.set_alarm_in(1, umbrel_updater)
 
     def check_screen_size(_loop, __data):
         try:
@@ -542,7 +542,7 @@ def main_dashboard(config, tor):
     main_loop.set_alarm_in(0, login_updater)
     main_loop.set_alarm_in(0, tor_updater)
     main_loop.set_alarm_in(0, mp_updater)
-    main_loop.set_alarm_in(0, umbrel_updater)
+#    main_loop.set_alarm_in(0, umbrel_updater)
     main_loop.set_alarm_in(0, get_quote)
     main_loop.set_alarm_in(0, check_screen_size)
     main_loop.set_alarm_in(0, services_updater)
