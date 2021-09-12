@@ -361,9 +361,7 @@ def data_specter(use_cache=True):
 
     for tx in txs['txlist']:
         if tx['category'] == 'send':
-            multiplier = -1
-            fee = tx['fee']
-            logging.info(f'Tx Fee: {fee}') 
+            multiplier = -1 
         else:
             multiplier = 1
         balance += tx['amount'] * multiplier
