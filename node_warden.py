@@ -127,7 +127,7 @@ def check_version(upgrade_args=True):
             text=f"Checking for updates. Running version: {current_version}",
             color="green") as spinner:
 
-        url = 'https://raw.githubusercontent.com/pxsocs/warden_terminal/master/version.txt'
+        url = 'https://raw.githubusercontent.com/AnarchyNow/warden_terminal/master/version.txt'
         try:
             remote_version = tor_request(url).text
         except Exception:
