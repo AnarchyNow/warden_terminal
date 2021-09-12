@@ -12,8 +12,7 @@ Displaying:
 - Tor Status
 - Satoshi Quote Randomizer
 - System info (CPU temperature, storage, etc)
-- Wallet info [**coming soon**]
-
+- Wallet info
 ## Screenshot
 
 ![ScreenShot](/static/images/screen_shot.jpeg "App Screen Shot")
@@ -84,8 +83,7 @@ python3 node_warden.py &
 
 Consider making a donation.
 
-tipping.me (Lightning): https://tippin.me/@alphaazeta
-onchain: bc1q4fmyksw40vktte9n6822e0aua04uhmlez34vw5gv72zlcmrkz46qlu7aem
+BTC: bc1qnhwa700lq43zzmdq4r4fwwzkd8akjrjl3q6l6d
 
 ## FAQ:
 
