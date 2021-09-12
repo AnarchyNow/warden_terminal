@@ -362,8 +362,8 @@ def data_specter(use_cache=True):
     for tx in txs['txlist']:
         if tx['category'] == 'send':
             multiplier = -1
-#            fee = tx['fee']
-#            logging.info(f'Tx Fee: {fee}') 
+            fee = tx['fee']
+            logging.info(f'Tx Fee: {fee}') 
         else:
             multiplier = 1
         balance += tx['amount'] * multiplier
@@ -380,8 +380,6 @@ def data_specter(use_cache=True):
         btc_price = cleanfloat(btc['DISPLAY']['BTC']['USD']['PRICE'])
     except Exception:
         btc_price = 0
-
-    balance -= .00044922
 
     fiat_balance = btc_price * balance
 
