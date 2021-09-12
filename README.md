@@ -17,7 +17,7 @@ Displaying:
 
 ## Screenshot
 
-![ScreenShot](/static/images/screen_shot.jpeg "App Screen Shot")
+![ScreenShot](/static/images/Screen Shot.jpeg "App Screen Shot")
 
 ## Installation
 
