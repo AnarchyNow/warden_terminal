@@ -7,7 +7,7 @@ x-logging: &default-logging
 
 services:
   warden:
-    image: pxsocs/node_warden:latest
+    image: anarchynow/node_warden:latest
     logging: *default-logging
     restart: on-failure
     tty: true
