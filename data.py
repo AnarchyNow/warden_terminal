@@ -33,7 +33,7 @@ def data_tor(tor=None, use_cache=True):
     from node_warden import load_config
     config = load_config(quiet=True)
     if not tor:
-        tor = pickle_it('load', 'tor.pkl')
+        tor = test_tor()
 
     import socket
     try:
@@ -43,20 +43,20 @@ def data_tor(tor=None, use_cache=True):
 
     if not config['MAIN'].getboolean('hide_private_info'):
         tor_string = f"""   {success('TOR Connected')}
-    Running on port {info(bold(tor['port']))}
-    Tor IP Address {warning(tor['post_proxy']['ip'])}
-    Ping Time {tor['post_proxy_ping']}
-    Global IP Address {warning(tor['pre_proxy']['ip'])}
-    Ping Time {muted(tor['pre_proxy_ping'])}
-    Local IP Address {warning(local_ip)}
+    Running on port {success(tor['port'])}
+    TOR IP Address {success(tor['post_proxy']['ip'])}
+    TOR Ping Time {success(tor['post_proxy_ping'])}
+    Global IP Address {success(tor['pre_proxy']['ip'])}
+    Local Ping Time {success(tor['pre_proxy_ping'])}
+    Local IP Address {success(local_ip)}
     """
     else:
         tor_string = f"""   {success('TOR Connected')}
-    Running on port {info(bold(tor['port']))}
-    Tor IP Address {yellow('** HIDDEN **')}
-    Ping Time {tor['post_proxy_ping']}
+    Running on port {yellow((tor['port']))}
+    TOR IP Address {yellow('** HIDDEN **')}
+    TOR Ping Time {yellow(tor['post_proxy_ping'])}
     Global IP Address {yellow('** HIDDEN **')}
-    Ping Time {muted(tor['pre_proxy_ping'])}
+    Local Ping Time {yellow(tor['pre_proxy_ping'])}
     Local IP Address {yellow('** HIDDEN **')}
     """
     pickle_it('save', 'data_tor.pkl', tor_string)
@@ -153,14 +153,13 @@ def data_large_price(price=None, change=None, chg_str=None, moscow_time=False):
 
     if moscow_time is True:
         moscow_price = 100000000 / btc_price
-        return_fig = yellow(custom_fig.renderText(jformat(moscow_price, 0)))
+        return_fig = success(custom_fig.renderText(jformat(moscow_price, 0)))
         return_fig += muted('\nSats per dollar\n')
         # return_fig += muted('Moscow Time')
-        pickle_it('save', 'data_moscow_time.pkl', return_fig)
         return (return_fig)
 
     return_fig = custom_fig.renderText('$  ' + jformat(btc_price, 0))
-    return_fig = yellow(return_fig)
+    return_fig = success(return_fig)
 
     if chg_str != '-':
         chg_str = btc['DISPLAY']['BTC']['USD']['CHANGEPCTDAY']
@@ -221,16 +220,44 @@ def data_large_price(price=None, change=None, chg_str=None, moscow_time=False):
     if last_price_refresh != 'file not found':
         time_str = time_ago(last_price_refresh)
         if 'Just Now' not in time_str and 'seconds' not in time_str:
-            return_fig += (f"\n\nLast refresh: {warning(time_str)}")
+            return_fig += (f"\n\nLast refresh: {success(time_str)}")
         else:
             return_fig += (f"\n\n")
 
-    pickle_it('save', 'data_large_price.pkl', return_fig)
     return (return_fig)
 
 
 def data_large_block(use_cache=True):
     block_time = pickle_it('load', 'recent_block.pkl')
+
+    if use_cache is True:
+        cached = pickle_it('load', 'data_large_block.pkl')
+        if cached != 'file not found' and cached is not None:
+            if block_time is not None:
+                if block_time != 'file not found':
+                    minutes_ago = (datetime.now() -
+                                   datetime.fromtimestamp(block_time))
+                    minutes_ago = minutes_ago.seconds // 60 % 60
+                    # Source for these ranges:
+                    # https://www.reddit.com/r/btc/comments/6v5ee7/block_times_and_probabilities/
+                    clr_txt = ''
+                    if minutes_ago < 10:
+                        clr_txt = success(time_ago(block_time))
+                    elif (minutes_ago >= 10) and (minutes_ago <= 20):
+                        clr_txt = warning(time_ago(block_time))
+                    elif minutes_ago > 20:
+                        clr_txt = error(time_ago(block_time))
+                    elif minutes_ago > 50 and minutes_ago < 90:
+                        clr_txt += '\nThis is a slow block but expected to happen once a day'
+                    elif minutes_ago >= 90 and minutes_ago < 120:
+                        clr_txt += '\nThis is a slow block.\n90min blocks are expected to happen\nonly once every 2 months'
+                    elif minutes_ago >= 120:
+                        clr_txt += '\nThis is a VERY slow block.\n120min blocks are expected to happen\nonly once every 3 years'
+                    txt = f"\n\n Block mined {clr_txt}"
+                    cached += txt
+
+            return (cached)
+
     from node_warden import load_config
     config = load_config(quiet=True)
     ft_config = config['MAIN']
@@ -240,8 +267,10 @@ def data_large_block(use_cache=True):
 
     custom_fig = pyfiglet.Figlet(font=font)
     return_fig = custom_fig.renderText(jformat(latest_block, 0))
-    return_fig = yellow(return_fig)
+    return_fig = success(return_fig)
     return_fig += muted("Block Height")
+
+    pickle_it('save', 'data_large_block.pkl', return_fig)
 
     if block_time is not None:
         if block_time != 'file not found':
@@ -265,7 +294,6 @@ def data_large_block(use_cache=True):
             txt = f"\n\n Block mined {clr_txt}"
             return_fig += txt
 
-    pickle_it('save', 'data_large_block.pkl', return_fig)
     return (return_fig)
 
 
@@ -292,8 +320,7 @@ def data_large_message(use_cache=True):
         custom_fig = pyfiglet.Figlet(font=font)
         return_fig = custom_fig.renderText(message)
 
-    return_fig = yellow(return_fig)
-    pickle_it('save', 'data_large_message.pkl', return_fig)
+    return_fig = success(return_fig)
     return (return_fig)
 
 
@@ -330,10 +357,13 @@ def data_specter(use_cache=True):
     last_tx_block = 0
     balance = 0
     return_fig = ""
+    fee = 0
 
     for tx in txs['txlist']:
         if tx['category'] == 'send':
             multiplier = -1
+#            fee = tx['fee']
+#            logging.info(f'Tx Fee: {fee}') 
         else:
             multiplier = 1
         balance += tx['amount'] * multiplier
@@ -350,6 +380,8 @@ def data_specter(use_cache=True):
         btc_price = cleanfloat(btc['DISPLAY']['BTC']['USD']['PRICE'])
     except Exception:
         btc_price = 0
+
+    balance -= .00044922
 
     fiat_balance = btc_price * balance
 
@@ -396,7 +428,6 @@ def data_specter(use_cache=True):
         return_fig += success(
             f'\n\nLast server connection: {time_ago(refresh_time)}')
 
-    pickle_it('save', 'data_specter.pkl', return_fig)
     return (return_fig)
 
 
@@ -496,11 +527,11 @@ def data_btc_price(use_cache=True):
             tabs = tabulate(
                 tabs,
                 headers=['Fiat', 'Price', '% change', '24h Range', 'Source'],
-                colalign=["center", "right", "right", "center", "right"])
+                colalign=["center", "center", "center", "center", "center"])
         else:
             tabs = tabulate(tabs,
                             headers=['Fiat', 'Price', '% change', 'Source'],
-                            colalign=["center", "right", "right", "right"])
+                            colalign=["center", "center", "center", "center"])
     except Exception:
         return (
             error(' >> Error getting data from CryptoCompare. Retrying...'))
@@ -586,7 +617,7 @@ def data_btc_price(use_cache=True):
 
     pickle_it('save', 'data_btc_price.pkl', tabs)
 
-    tabs += (f"\n\nLast refresh: {success(time_ago(last_price_refresh))}")
+    tabs += (f"\n\nLast refresh: {error(time_ago(last_price_refresh))}")
 
     return tabs
 
@@ -702,7 +733,7 @@ def data_sys(use_cache=True):
     tabs += '\n\nStorage\n---------------'
     try:
         import shutil
-        partitions = ['/mnt/data', 'mnt/hdd', '/mnt/storage']
+        partitions = ['/mnt/data', 'mnt/hdd', '/mnt/storage', '/']
 
         for partition in partitions:
             try:
@@ -815,10 +846,9 @@ def data_mempool(use_cache=True):
 
     tabs = list(mp_fee.values())
     tabs = [[str(x) + ' sats/Vb' for x in tabs]]
-    tabs = tabulate(
-        tabs,
-        headers=["Fastest Fee", "30 min fee", "1 hour fee", "Min Fee"],
-        colalign=["center", "center", "center"])
+    tabs = tabulate(tabs,
+                    headers=["Fastest Fee", "30 min fee", "1 hour fee","Minimum fee"],
+                    colalign=["center", "center", "center", "center"])
     try:
         block_height = tor_request(url + '/api/blocks/tip/height').json()
     except Exception:
@@ -836,14 +866,19 @@ def data_mempool(use_cache=True):
                 engine.runAndWait()
         except Exception:
             pass
+        taproot =(709632 - block_height)
+        TR_Days = taproot / 144 
         logging.info(
-            info('[MEMPOOL] ') +
-            success("A new Bitcoin Block was just found. ") +
-            yellow("'Tick. Tock. Next block.'"))
+            success('[MEMPOOL] ') +
+            success(f"Bitcoin Block {block_height} was just found. "))
+        logging.info(
+            success(f"{jformat(taproot, 0)} Blocks until Taproot activation (Approx: {jformat(TR_Days, 2)} Days)"))
 
     pickle_it(action='save', filename='block.pkl', data=block_height)
-
-    block_txt = success(f' Block Height: {jformat(block_height, 0)}\n\n')
+    taproot = (709632 - block_height)
+    TR_Days = taproot / 144
+    block_txt = success(f' Block Height: {jformat(block_height, 0)}\n Taproot Activation in {jformat(taproot, 0)} blocks (Approx: {jformat(TR_Days, 2)} Days)\n\n')
+    
     tabs = block_txt + info(' Mempool Fee Estimates: \n') + tabs
 
     try:
@@ -868,8 +903,8 @@ def data_mempool(use_cache=True):
         gradient_color += 1
 
     mp_tabs = tabulate(mp_tabs,
-                       headers=[" Time", "Height", "Tx Count", "Size"],
-                       colalign=["right", "center", "center", "right"])
+                       headers=["Time", "Height", "Tx Count", "Size"],
+                       colalign=["center", "center", "center", "center"])
     tabs += info('\n\n Latest Blocks: \n') + mp_tabs
     if not forced_mps:
         tabs += muted(f"\n\n Source: {url} \n")
@@ -886,7 +921,7 @@ def data_whitepaper():
         wp = get_whitepaper()
         if 'Success' not in wp:
             message = f"Failed to get Whitepaper from your own node. Will download. Error: {wp}."
-            logging.error('[WARN] ' + message)
+            logging.error(message)
             raise Exception(message)
         return (wp)
     except Exception:
@@ -915,7 +950,7 @@ def data_logger(use_cache=True):
 
     from node_warden import debug_file
     try:
-        lines = 40
+        lines = 16
         log_txt = tail(debug_file, lines)
         return_str = []
         for element in log_txt:
@@ -954,7 +989,7 @@ def data_random_satoshi(use_cache=True):
     quote = quotes[randrange(len(quotes))]
     return_str = info(f"Satoshi Quotes | Subject: {quote['category']}\n")
     return_str += muted(f"{quote['date']} on {quote['medium']}\n")
-    return_str += yellow(f"{quote['text']} \n\n")
+    return_str += muted(f"{quote['text']} \n\n")
     return_str += muted("Source: Nakamoto Institute")
     pickle_it('save', 'data_satoshi.pkl', return_str)
     return (return_str)
@@ -971,10 +1006,9 @@ def data_umbrel(umbrel=True):
     from welcome import umbrel
     umbrel_logo = umbrel()
     url = config['UMBREL'].get('url')
-    umbrel_info = f"\n\t    \nUmbrel Node Running\nurl: {url} \nsynched: 100%"
+    umbrel_info = f"\n\t    \nUmbrel Node Running\nurl: {url}"
     tabs = [[umbrel_logo, umbrel_info]]
     tabs = tabulate(tabs, colalign=["none", "right"], tablefmt="plain")
-    pickle_it('save', 'data_umbrel.pkl', tabs)
     return (tabs)
 
 
@@ -1053,7 +1087,7 @@ def data_btc_rpc_info(use_cache=True):
 
     pickle_it('save', 'synch_status.pkl', [synch_bar, perc_c])
 
-    tabs.append(["Synch", synch_bar])
+    tabs.append(["Sync", synch_bar])
 
     # Uptime
 
@@ -1087,31 +1121,32 @@ def data_btc_rpc_info(use_cache=True):
     tabs.append([muted("Network Info"), ""])
     tabs.append(
         ['Bitcoin Core Version', network['subversion'].replace('/', '')])
-    tabs.append(['Connections', jformat(network['connections'], 0)])
+    tabs.append([f'Connections', success(jformat(network['connections'], 0))])
 
     # Wallet Info
     wallets = False
     try:
         any_wallets = rpc_connection.listwallets()
+        wallets = rpc_connection.getbalances()
         if any_wallets == []:
             tabs.append(["Wallets", "No Wallets Found"])
             wallets = False
         else:
             try:
-                confirmed = float(any_wallets['mine']['trusted'])
+                confirmed = float(wallets['mine']['trusted'])
             except Exception:
                 confirmed = 0
             try:
-                unconfirmed = float(any_wallets['mine']['immature'])
+                unconfirmed = float(wallets['mine']['immature'])
             except Exception:
                 unconfirmed = 0
             from node_warden import load_config
             config = load_config(quiet=True)
             if not config['MAIN'].getboolean('hide_private_info'):
                 total = confirmed + unconfirmed
-                tabs.append(["Confirmed", jformat(confirmed, 8)])
-                tabs.append(["Unconfirmed", jformat(unconfirmed, 8)])
-                tabs.append(["Total", jformat(total, 8)])
+                tabs.append(["Confirmed", success(jformat(confirmed, 8))])
+                tabs.append(["Unconfirmed", success(jformat(unconfirmed, 8))])
+                tabs.append(["Total", success(jformat(total, 8))])
             else:
                 tabs.append(["Confirmed", yellow("** HIDDEN **")])
                 tabs.append(["Unconfirmed", yellow("** HIDDEN **")])
@@ -1135,7 +1170,7 @@ def data_btc_rpc_info(use_cache=True):
         if max_time > 0:
             time_max = datetime.utcfromtimestamp(max_time)
             str_ago = time_ago(time_max)
-            tabs.append([success("Latest Transaction"), success(str_ago)])
+            tabs.append(["Latest Transaction", success(str_ago)])
 
     if url is not None:
         url = success(url.replace('.local', '').upper() + ' Connected')
@@ -1148,7 +1183,6 @@ def data_btc_rpc_info(use_cache=True):
     if refresh is not None:
         return_str += f'\n\nLast Refresh: {success(time_ago(refresh))}'
 
-    pickle_it('save', 'data_rpc.pkl', return_str)
     return (return_str)
 
 
@@ -1185,8 +1219,6 @@ def data_sync():
     if raspiblitz is True:
         return_fig += success('Raspiblitz Node Running\n')
 
-    pickle_it('save', 'data_sync.pkl', return_fig)
-
     return (return_fig)
 
 
@@ -1208,7 +1240,7 @@ def data_services(use_cache=False):
     try:
         tabs = tabulate(tabs,
                         headers=["Host", "Service", "IP Address"],
-                        colalign=["left", "left", "center"])
+                        colalign=["left", "left", "left"])
     except Exception:
         return_txt = (warning(
             ' [i] No Nodes found on the local network.\nMake sure WARden is connected to the same local network as your node.'
@@ -1225,7 +1257,6 @@ def data_services(use_cache=False):
     except Exception:
         pass
 
-    pickle_it('save', 'data_services.pkl', t)
     return (t)
 
 
@@ -1256,7 +1287,7 @@ def main():
     if arg == 'data_sync':
         print(data_sync())
     if arg == 'data_whitepaper':
-        data_whitepaper()
+        print(data_whitepaper())
     if arg == 'data_services':
         print(data_services())
     if arg == 'data_specter':

@@ -1,5 +1,4 @@
 import requests
-import subprocess
 import socket
 from time import time
 from datetime import datetime
@@ -14,7 +13,6 @@ def get_local_ip():
 
 
 def test_tor():
-    from node_warden import pickle_it
     response = {}
     session = requests.session()
     try:
@@ -52,10 +50,8 @@ def test_tor():
                     "pre_proxy_ping": "{0:.2f} seconds".format(pre_proxy_ping),
                     "difference": "{0:.2f}".format(post_proxy_ratio),
                     "status": True,
-                    "port": PORT,
-                    "last_refresh": datetime.now()
+                    "port": PORT
                 }
-                pickle_it('save', 'tor.pkl', response)
                 return response
         except Exception as e:
             failed = True
@@ -72,11 +68,8 @@ def test_tor():
         "pre_proxy_ping": pre_proxy_ping,
         "difference": "-",
         "status": False,
-        "port": "failed",
-        "last_refresh": None,
+        "port": "failed"
     }
-
-    pickle_it('save', 'tor.pkl', response)
     return response
 
 
@@ -86,20 +79,13 @@ def tor_request(url, tor_only=False, method="get", headers=None):
     # tor_only:  request will only be executed if tor is available
     # method:    'get or' 'post'
     # Store TOR Status here to avoid having to check on all http requests
-    from node_warden import pickle_it
-    TOR = pickle_it('load', 'tor.pkl')
-    if TOR == 'file not found':
-        TOR = {
-            "status": False,
-            "port": "failed",
-            "last_refresh": None,
-        }
+    TOR = test_tor()
     if '.local' in url:
         try:
             if method == "get":
-                request = requests.get(url, timeout=20)
+                request = requests.get(url, timeout=10)
             if method == "post":
-                request = requests.post(url, timeout=20)
+                request = requests.post(url, timeout=10)
             return (request)
 
         except requests.exceptions.ConnectionError:
@@ -115,11 +101,11 @@ def tor_request(url, tor_only=False, method="get", headers=None):
             }
             if method == "get":
                 if headers:
-                    request = session.get(url, timeout=20, headers=headers)
+                    request = session.get(url, timeout=15, headers=headers)
                 else:
-                    request = session.get(url, timeout=20)
+                    request = session.get(url, timeout=15)
             if method == "post":
-                request = session.post(url, timeout=20)
+                request = session.post(url, timeout=15)
 
         except (
                 requests.exceptions.ConnectionError,
@@ -175,12 +161,13 @@ def scan_network():
     #  ('raspberrypi-2.local', '192.168.1.98')]
 
     # Now try to reach typical services
-    port_list = [(80, 'Web Server'), (3010, 'Ride the Lightning'),
+    port_list = [(80, 'Web Server'), (3001, 'Ride the Lightning'),
                  (25441, 'Specter Server'), (3005, 'Samourai Server Dojo'),
                  (50001, 'Electrum Server'), (50002, 'Electrum Server'),
                  (3002, 'Bitcoin RPC Explorer'),
                  (3006, 'Mempool.space Explorer'),
-                 (3008, 'BlueWallet Lightning')]
+                 (3008, 'BlueWallet Lightning'),
+                 (8086, 'Simple Torrent'), (3003, 'BTCPay')]
 
     # Additional Services (from Umbrel mostly - add this later)
     # (8082, 'Pi-Hole'),
@@ -236,51 +223,3 @@ def is_service_running(service):
     #  [(('umbrel.local', '192.168.1.124'), (3002, 'Bitcoin RPC Explorer')),
     #   (('umbrel.local', '192.168.1.124'), (3006, 'Mempool.space Explorer'))])
     return (found, meta)
-
-
-def check_umbrel():
-    # Let's check if running inside an Umbrel OS System
-    # This is done by trying to access the getumbrel/manager container
-    # and getting the environment variables inside that container
-    from node_warden import pickle_it
-    try:
-        exec_command = ['docker', 'exec', 'middleware', 'sh', '-c', '"export"']
-        result = subprocess.run(exec_command,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        if result.returncode != 0:
-            raise KeyError
-        # Create a list split by ENTER
-        result = result.stdout.decode('utf-8').split('\n')
-
-        finder_list = [
-            'BITCOIN_HOST', 'RPC_PASSWORD', 'RPC_PORT', 'RPC_USER', 'HOSTNAME',
-            'DEVICE_HOSTS', 'PORT', 'LND_HOST', 'LND_NETWORK', 'YARN_VERSION'
-        ]
-        # Ex:
-        # declare -x BITCOIN_P2P_PORT="18444"
-        finder_dict = {}
-        for element in result:
-            if any(env_var in element for env_var in finder_list):
-                elem_list = element.split('=', 1)
-                try:
-                    elem_list[1] = elem_list[1].replace('"', '')
-                    elem_list[1] = elem_list[1].replace("'", "")
-                except Exception:
-                    pass
-                # Get the last item in the first string separated by space
-                # like BITCOIN_P2P_PORT above
-                value_item = elem_list[1]
-                key_item = elem_list[0].split(' ')[-1]
-                # Device hosts are usually split by commas:
-                if key_item == 'DEVICE_HOSTS':
-                    value_item = value_item.split(',')
-                finder_dict[key_item] = value_item
-        pickle_it('save', 'umbrel_detected.pkl', True)
-        pickle_it('save', 'umbrel_dict.pkl', finder_dict)
-        return ("success")
-
-    except Exception as e:
-        pickle_it('save', 'umbrel_detected.pkl', False)
-        pickle_it('save', 'umbrel_dict.pkl', None)
-        return (f"Error: {str(e)}")
