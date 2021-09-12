@@ -16,7 +16,7 @@ Displaying:
 - Specter Desktop integration
 
 ## Screenshot
-![ScreenShot](https://github.com/AnarchyNow/warden_terminal/blob/master/static/images/ScreenShot.jpeg)
+![ScreenShot](https://github.com/AnarchyNow/warden_terminal/blob/master/static/images/ScreenShot.jpg)
 
 ## Installation
 
