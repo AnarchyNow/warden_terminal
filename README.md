@@ -12,7 +12,8 @@ Displaying:
 - Tor Status
 - Satoshi Quote Randomizer
 - System info (CPU temperature, storage, etc)
-- Wallet info [**coming soon**]
+- Wallet info via RPC Explorer
+- Specter Desktop integration
 
 ## Screenshot
 
@@ -23,7 +24,7 @@ Displaying:
 Clone the git repository into any directory:
 
 ```bash
-git clone https://github.com/pxsocs/warden_terminal
+git clone https://github.com/AnarchyNow/warden_terminal 
 ```
 
 Install Requirements:
