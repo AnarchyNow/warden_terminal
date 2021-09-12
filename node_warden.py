@@ -967,14 +967,14 @@ def main(quiet=None):
         check_cryptocompare()
         # Find if a node is present
         check_umbrel()
- #       check_raspiblitz()
- #       check_mynode()
+        check_raspiblitz()
+        check_mynode()
         check_nodetype()
         check_specter()
         check_os()
         check_btc_rpc()
- #       login_tip()
- #       greetings()
+        login_tip()
+        greetings()
 
     else:
         config = load_config(True)
