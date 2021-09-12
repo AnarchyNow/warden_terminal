@@ -83,9 +83,7 @@ python3 node_warden.py &
 ## Enjoyed the app?
 
 Consider making a donation.
-
-tipping.me (Lightning): https://tippin.me/@alphaazeta
-onchain: bc1q4fmyksw40vktte9n6822e0aua04uhmlez34vw5gv72zlcmrkz46qlu7aem
+BTC: bc1qhc3c5hvkh0k9muhprc9lgmh90s7w4p5v5xg7fj
 
 ## FAQ:
 
