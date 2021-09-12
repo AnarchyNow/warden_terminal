@@ -17,7 +17,12 @@ Displaying:
 
 ## Screenshot
 
-(/static/images/Screen Shot.jpeg "App Screen Shot")
+
+
+
+            Screen Shot.jpeg
+          
+  
 
 ## Installation
 
