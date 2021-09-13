@@ -78,10 +78,10 @@ def main_dashboard(config, tor):
 
         if msg_add is not None:
             txt = ' WARden Node Edition (Version: ' + version() + str(
-                msg_add) + emoji.emojize(') | twitter :bird: @alphaazeta')
+                msg_add) + emoji.emojize(') | twitter :bird: @iamalwaysred')
         else:
             txt = ' WARden Node Edition (Version: ' + version(
-            ) + emoji.emojize(') | twitter :bird: @alphaazeta')
+            ) + emoji.emojize(') | twitter :bird: @iamalwaysred')
 
         btc = btc_price_data()
 
