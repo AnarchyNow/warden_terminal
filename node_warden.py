@@ -836,7 +836,7 @@ def check_umbrel():
                 logging.info(f"[MEMPOOL] Connected at {url}")
                 mempool = True
             except Exception as e:
-                logging.error("[MEMPOOL] Error {e}")
+                logging.error(f"[MEMPOOL] Error {e}")
                 spinner.fail("[i] ")
                 spinner.write(warning("    " + str(e)))
 
