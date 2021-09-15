@@ -353,11 +353,11 @@ def data_specter(use_cache=True):
     # Txs found, now get relevant data and format for output
     hidden = config['MAIN'].getboolean('hide_private_info')
     font = config['MAIN'].get('large_text_font')
+    fees = config['Portfolio'].getfloat('fees')
     last_tx_time = 0
     last_tx_block = 0
     balance = 0
     return_fig = ""
-    fee = 0
 
     for tx in txs['txlist']:
         if tx['category'] == 'send':
@@ -378,7 +378,8 @@ def data_specter(use_cache=True):
         btc_price = cleanfloat(btc['DISPLAY']['BTC']['USD']['PRICE'])
     except Exception:
         btc_price = 0
-
+    
+    balance -= fees
     fiat_balance = btc_price * balance
 
     if balance < 1:
