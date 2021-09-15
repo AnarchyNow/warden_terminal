@@ -353,7 +353,7 @@ def data_specter(use_cache=True):
     # Txs found, now get relevant data and format for output
     hidden = config['MAIN'].getboolean('hide_private_info')
     font = config['MAIN'].get('large_text_font')
-    fees = config['Portfolio'].getfloat('fees')
+    fees = config['PORTFOLIO'].getfloat('fees')
     last_tx_time = 0
     last_tx_block = 0
     balance = 0
