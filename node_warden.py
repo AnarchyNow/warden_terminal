@@ -997,7 +997,7 @@ def main(quiet=None):
     def node_web_grabs():
         data_mempool(use_cache=False)
         data_large_block(use_cache=False)
-        data_tor(use_cache=False)
+        data_tor(use_cache=True)
         rpc_running = pickle_it('load', 'rpc_running.pkl')
         if rpc_running:
             from rpc import pickle_rpc
