@@ -1141,13 +1141,13 @@ def data_btc_rpc_info(use_cache=True):
             config = load_config(quiet=True)
             if not config['MAIN'].getboolean('hide_private_info'):
                 total = confirmed + unconfirmed
-                tabs.append(["Confirmed", success(jformat(confirmed, 8))])
-                tabs.append(["Unconfirmed", success(jformat(unconfirmed, 8))])
-                tabs.append(["Total", success(jformat(total, 8))])
+                tabs.append(["Confirmed Balance", success("₿ " + jformat(confirmed, 8))])
+                tabs.append(["Unconfirmed Balance", error("₿ " + jformat(unconfirmed, 8))])
+                tabs.append(["Total Balance", success("₿ " + jformat(total, 8))])
             else:
-                tabs.append(["Confirmed", yellow("** HIDDEN **")])
-                tabs.append(["Unconfirmed", yellow("** HIDDEN **")])
-                tabs.append(["Total", yellow("** HIDDEN **")])
+                tabs.append(["Confirmed Balance", yellow("** HIDDEN **")])
+                tabs.append(["Unconfirmed Balance", yellow("** HIDDEN **")])
+                tabs.append(["Total Balance", yellow("** HIDDEN **")])
 
             wallets = True
 
