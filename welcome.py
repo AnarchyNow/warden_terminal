@@ -30,7 +30,6 @@ def goodbye():
          #GGGlGGGl##p,,p##lGGl##p,,p###ll##GGGG
         !GGGlW''''''*GGGGGGG#'WlGGGGG#W''*WGGGGS
          ''          '^          ''          ''
-
                     @GGS         lG#
                     !GGG        !GGG
                     !GGG        !GGG
