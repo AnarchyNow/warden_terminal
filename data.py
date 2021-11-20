@@ -654,7 +654,7 @@ def data_sys(use_cache=True):
 
     tabs = tabulate(tabs, colalign=["left", "right"])
 
-    tabs += '\n\nSystem Resources\n----------------'
+    tabs += '\n\nSystem Resources'
 
     # Get current size of window
     rows, columns = subprocess.check_output(['stty', 'size']).split()
@@ -676,7 +676,7 @@ def data_sys(use_cache=True):
             total=80,
             prefix='CPU Temperature',
             suffix=
-            f'{temp_result}°C\n                 (ideal range = 0°C to 70°C)',
+            f'{temp_result}°C',
             length=bar_size,
             unit='°C',
             perc=False,
@@ -714,7 +714,8 @@ def data_sys(use_cache=True):
             total=100,
             prefix='Memory Usage   ',
             suffix=
-            f'{round(mem_result.percent, 2)}%\n                 Total Memory {round(mem_result.total/1000000000,0)} GB',
+            #f'{round(mem_result.percent, 2)}%\n                 Total Memory {round(mem_result.total/1000000000,0)} GB',
+            f'{round(mem_result.percent, 2)}%',
             length=bar_size,
             perc=True,
             printEnd='',
@@ -727,7 +728,7 @@ def data_sys(use_cache=True):
 
     # Create Disk Usage Bar(s)
     # Get list of devices
-    tabs += '\n\nStorage\n---------------'
+    tabs += '\n\nStorage'
     try:
         import shutil
         partitions = ['/mnt/data', 'mnt/hdd', '/mnt/storage', '/']
@@ -744,9 +745,10 @@ def data_sys(use_cache=True):
                     total=100,
                     prefix=prefix,
                     suffix=
-                    (f'{round(perc_c, 2)}%' +
-                     f'\n                 {round(free / (10**9), 2)} GB available of {round(total / (10 ** 9), 2)} GB'
-                     ),
+                    #(f'{round(perc_c, 2)}%' +
+                    # f'\n                 {round(free / (10**9), 2)} GB available of {round(total / (10 ** 9), 2)} GB'
+                    # ),
+                    (f'{round(perc_c, 2)}%'),
                     length=bar_size,
                     perc=True,
                     printEnd='',
@@ -862,12 +864,13 @@ def data_mempool(use_cache=True):
                 engine.say(config['MEMPOOL'].get('block_found_txt'))
                 engine.runAndWait()
         except Exception:
-            pass 
+            pass
         logging.info(
             success('[MEMPOOL] ') +
-            success(f"Bitcoin Block {block_height} was just found. ")
+            success(f"Bitcoin Block {block_height} was just found. "))
 
     pickle_it(action='save', filename='block.pkl', data=block_height)
+
     block_txt = success(f' Block Height: {jformat(block_height, 0)}\n\n')
     
     tabs = block_txt + info(' Mempool Fee Estimates: \n') + tabs
@@ -1060,7 +1063,7 @@ def data_btc_rpc_info(use_cache=True):
 
     tabs = []
     # Testnet, Mainnet, etc...
-    tabs.append(["Chain", bci['chain']])
+    tabs.append(["Chain", success(bci['chain'])])
 
     # Create Synch progress bar
     try:
@@ -1083,18 +1086,18 @@ def data_btc_rpc_info(use_cache=True):
     # Uptime
 
     try:
-        tabs.append(["Uptime", f"{uptime}"])
+        tabs.append(["Uptime", success(f"{uptime}")])
     except Exception:
         pass
 
     # Initial BLOCK Download & other info
 
-    tabs.append(["Blockchain Size", humanbytes(bci['size_on_disk'])])
+    tabs.append(["Blockchain Size", success(humanbytes(bci['size_on_disk']))])
     pruned = bci['pruned']
     if pruned is True:
         tabs.append(["Prunned", warning("Prunned [!]")])
     else:
-        tabs.append(["Prunned", "Not Prunned"])
+        tabs.append(["Prunned", success("Not Pruned")])
     try:
         segwit = bci['softforks']['segwit']['active']
         if segwit is True:
@@ -1109,9 +1112,9 @@ def data_btc_rpc_info(use_cache=True):
         pass
 
     # Network Info
-    tabs.append([muted("Network Info"), ""])
+    tabs.append([muted("\nNetwork Info"), ""])
     tabs.append(
-        ['Bitcoin Core Version', network['subversion'].replace('/', '')])
+        ['Bitcoin Core Version', success(network['subversion'].replace('/', ''))])
     tabs.append([f'Connections', success(jformat(network['connections'], 0))])
 
     # Wallet Info
@@ -1135,9 +1138,9 @@ def data_btc_rpc_info(use_cache=True):
             config = load_config(quiet=True)
             if not config['MAIN'].getboolean('hide_private_info'):
                 total = confirmed + unconfirmed
-                tabs.append(["Confirmed Balance", success("₿ " + jformat(confirmed, 8))])
-                tabs.append(["Unconfirmed Balance", error("₿ " + jformat(unconfirmed, 8))])
-                tabs.append(["Total Balance", success("₿ " + jformat(total, 8))])
+                tabs.append(["Confirmed Balance", success(jformat(confirmed, 8))])
+                tabs.append(["Unconfirmed Balance", error(jformat(unconfirmed, 8))])
+                tabs.append(["Total Balance", success(jformat(total, 8))])
             else:
                 tabs.append(["Confirmed Balance", yellow("** HIDDEN **")])
                 tabs.append(["Unconfirmed Balance", yellow("** HIDDEN **")])
