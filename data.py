@@ -868,7 +868,7 @@ def data_mempool(use_cache=True):
             success(f"Bitcoin Block {block_height} was just found. ")
 
     pickle_it(action='save', filename='block.pkl', data=block_height)
-    block_txt = success(f' Block Height: {jformat(block_height, 0)}\n]')
+    block_txt = success(f' Block Height: {jformat(block_height, 0)}\n\n')
     
     tabs = block_txt + info(' Mempool Fee Estimates: \n') + tabs
 
