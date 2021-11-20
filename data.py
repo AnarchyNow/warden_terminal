@@ -1098,13 +1098,13 @@ def data_btc_rpc_info(use_cache=True):
     try:
         segwit = bci['softforks']['segwit']['active']
         if segwit is True:
-            tabs.append(["Segwit", success("Ready")])
+            tabs.append(["Segwit", success("Active")])
     except Exception:
         pass
     try:
         taproot = bci['softforks']['taproot']['active']
         if taproot is True:
-            tabs.append(["Taproot", success("Ready")])
+            tabs.append(["Taproot", success("Active")])
     except Exception:
         pass
 
