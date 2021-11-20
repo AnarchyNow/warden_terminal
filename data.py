@@ -862,19 +862,13 @@ def data_mempool(use_cache=True):
                 engine.say(config['MEMPOOL'].get('block_found_txt'))
                 engine.runAndWait()
         except Exception:
-            pass
-        taproot =(709632 - block_height)
-        TR_Days = taproot / 144 
+            pass 
         logging.info(
             success('[MEMPOOL] ') +
-            success(f"Bitcoin Block {block_height} was just found. "))
-        logging.info(
-            success(f"{jformat(taproot, 0)} Blocks until Taproot activation (Approx: {jformat(TR_Days, 2)} Days)"))
+            success(f"Bitcoin Block {block_height} was just found. ")
 
     pickle_it(action='save', filename='block.pkl', data=block_height)
-    taproot = (709632 - block_height)
-    TR_Days = taproot / 144
-    block_txt = success(f' Block Height: {jformat(block_height, 0)}\n Taproot Activation in {jformat(taproot, 0)} blocks (Approx: {jformat(TR_Days, 2)} Days)\n\n')
+    block_txt = success(f' Block Height: {jformat(block_height, 0)}\n]')
     
     tabs = block_txt + info(' Mempool Fee Estimates: \n') + tabs
 
