@@ -202,7 +202,7 @@ def data_large_price(price=None, change=None, chg_str=None, moscow_time=False):
             if sats is True:
                 position_str += ' sats'
             else:
-                position_str = '₿ ' + position_str
+                position_str = position_str + ' BTC'
 
             position_tab = []
             position_tab.append(
@@ -393,7 +393,7 @@ def data_specter(use_cache=True):
         if sats is True:
             return_fig += success(balance + " Sats\n")
         else:
-            return_fig += success("₿ " + balance + "\n")
+            return_fig += success(balance + " BTC" +"\n")
 
         if fiat_balance != 0:
             return_fig += success(f"$ {jformat(fiat_balance, 0)}\n\n")
@@ -598,7 +598,7 @@ def data_btc_price(use_cache=True):
             if sats is True:
                 position_str += ' sats'
             else:
-                position_str = '₿ ' + position_str
+                position_str = position_str + ' BTC'
 
             position_tab = []
             position_tab.append(
@@ -871,9 +871,9 @@ def data_mempool(use_cache=True):
 
     pickle_it(action='save', filename='block.pkl', data=block_height)
 
-    block_txt = success(f' Block Height: {jformat(block_height, 0)}\n\n')
-    
-    tabs = block_txt + info(' Mempool Fee Estimates: \n') + tabs
+    #block_txt = success(f' Block Height: {jformat(block_height, 0)}\n\n')
+    #tabs = block_txt + info(' Mempool Fee Estimates: \n') + tabs
+    tabs = info(' Mempool Fee Estimates: \n') + tabs
 
     try:
         mp_blocks = tor_request(url + '/api/blocks').json()
@@ -1086,7 +1086,7 @@ def data_btc_rpc_info(use_cache=True):
     # Uptime
 
     try:
-        tabs.append(["Uptime", success(f"{uptime}")])
+        tabs.append(["Uptime", success(f"{uptime} sec")])
     except Exception:
         pass
 
@@ -1138,12 +1138,12 @@ def data_btc_rpc_info(use_cache=True):
             config = load_config(quiet=True)
             if not config['MAIN'].getboolean('hide_private_info'):
                 total = confirmed + unconfirmed
-                tabs.append(["Confirmed Balance", success(jformat(confirmed, 8))])
-                tabs.append(["Unconfirmed Balance", error(jformat(unconfirmed, 8))])
+               # tabs.append(["Confirmed Balance", success(jformat(confirmed, 8))])
+               # tabs.append(["Unconfirmed Balance", error(jformat(unconfirmed, 8))])
                 tabs.append(["Total Balance", success(jformat(total, 8))])
             else:
-                tabs.append(["Confirmed Balance", yellow("** HIDDEN **")])
-                tabs.append(["Unconfirmed Balance", yellow("** HIDDEN **")])
+                #tabs.append(["Confirmed Balance", yellow("** HIDDEN **")])
+                #tabs.append(["Unconfirmed Balance", yellow("** HIDDEN **")])
                 tabs.append(["Total Balance", yellow("** HIDDEN **")])
 
             wallets = True
@@ -1164,7 +1164,7 @@ def data_btc_rpc_info(use_cache=True):
         if max_time > 0:
             time_max = datetime.utcfromtimestamp(max_time)
             str_ago = time_ago(time_max)
-            tabs.append(["Latest Transaction", success(str_ago)])
+            #tabs.append(["Latest Transaction", success(str_ago)])
 
     if url is not None:
         url = success(url.replace('.local', '').upper() + ' Connected')
