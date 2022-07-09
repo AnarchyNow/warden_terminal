@@ -846,8 +846,8 @@ def data_mempool(use_cache=True):
     tabs = list(mp_fee.values())
     tabs = [[str(x) + ' sats/Vb' for x in tabs]]
     tabs = tabulate(tabs,
-                    headers=["Fastest Fee", "30 min fee", "1 hour fee","Minimum fee"],
-                    colalign=["center", "center", "center", "center"])
+                    headers=["No Priority", "Fastest Fee", "30 min fee", "1 hour fee","Minimum fee"],
+                    colalign=["center", "center", "center", "center", "center"])
     try:
         block_height = tor_request(url + '/api/blocks/tip/height').json()
     except Exception:
